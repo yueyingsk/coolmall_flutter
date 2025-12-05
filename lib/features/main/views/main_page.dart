@@ -1,6 +1,11 @@
+import 'package:coolmall_flutter/app/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+import '../models/nav_item.dart';
+import '../viewmodel/nav_bar_viewmodel.dart';
 
 class MainPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -11,45 +16,29 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
-  // 从 NavigationShell 获取当前选中的索引
-  int get _selectedIndex => widget.navigationShell.currentIndex;
-
-  // 记录每个导航项的动画控制器，用于控制动画播放
-  final List<AnimationController?> _animationControllers = [
-    null,
-    null,
-    null,
-    null,
-  ];
-
-  // 记录正在播放动画的导航项索引
-  int? _playingIndex;
-
-  // 导航项配置
-  final List<String> _navLabels = ['主页', '分类', '购物车', '我的'];
-  final List<String> _navAnimations = [
-    'assets/lottie/home.json',
-    'assets/lottie/category.json',
-    'assets/lottie/cart.json',
-    'assets/lottie/me.json',
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      // 停止之前播放的动画
-      if (_playingIndex != null) {
-        _animationControllers[_playingIndex!]?.stop();
-        _animationControllers[_playingIndex!]?.reset();
-      }
-
-      // 设置当前播放动画的索引
-      _playingIndex = index;
-
-      // 重置并播放当前选中项的动画
-      _animationControllers[index]?.reset();
-      _animationControllers[index]?.forward();
+class _MainPageState extends State<MainPage> {
+  @override
+  void initState() {
+    super.initState();
+    // 获取导航栏状态管理
+    final navBarViewModel = context.read<NavBarViewModel>();
+    // 初始化导航项动画
+    // Future.microtask(() {
+    //   // 播放首页动画
+    //   navBarViewModel.playAnimation(widget.navigationShell.currentIndex);
+    // });
+    Future.delayed(Duration(milliseconds: 500), () {
+      // 播放首页动画
+      navBarViewModel.playAnimation(widget.navigationShell.currentIndex);
+      setState(() {});
     });
+  }
+
+  // 导航项点击事件处理
+  void _onItemTapped(int index, NavBarViewModel navBarViewModel) {
+    // 使用状态管理播放动画
+    navBarViewModel.playAnimation(index);
+    navBarViewModel.setSelectedIndex(index);
 
     // 使用 NavigationShell 切换页面
     widget.navigationShell.goBranch(
@@ -60,56 +49,62 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // 构建导航项
-    List<BottomNavigationBarItem> _navItems = List.generate(_navLabels.length, (
-      index,
-    ) {
+    // 获取导航栏状态管理
+    final navBarViewModel = context.read<NavBarViewModel>();
+
+    return Scaffold(
+      body: widget.navigationShell, // 使用 NavigationShell 作为主内容区域
+      bottomNavigationBar: BottomNavigationBar(
+        items: _getNavItems(context, navBarViewModel),
+        currentIndex: widget.navigationShell.currentIndex,
+        onTap: (index) {
+          if (index != widget.navigationShell.currentIndex) {
+            _onItemTapped(index, navBarViewModel);
+          }
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        selectedLabelStyle: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(color: primaryDefault),
+        unselectedLabelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+        ),
+        elevation: 0,
+      ),
+    );
+  }
+
+  List<BottomNavigationBarItem> _getNavItems(
+    BuildContext context,
+    NavBarViewModel navBarViewModel,
+  ) {
+    return List.generate(NavItem.values.length, (index) {
+      final navItem = NavItem.values[index];
       return BottomNavigationBarItem(
         icon: SizedBox(
           width: 32, // 调整合适的宽度
           height: 32, // 调整合适的高度
           child: Lottie.asset(
-            _navAnimations[index],
+            navItem.animationPath,
             repeat: false, // 不重复播放
             animate: false, // 默认不自动播放
             fit: BoxFit.contain,
             onLoaded: (composition) {
               // 创建动画控制器
               final controller = AnimationController(
-                vsync: this,
+                vsync: Navigator.of(context).overlay as TickerProvider,
                 duration: composition.duration,
               );
 
-              setState(() {
-                _animationControllers[index] = controller;
-              });
+              // 将动画控制器保存到状态管理中
+              navBarViewModel.setAnimationController(navItem, controller);
             },
-            controller: _animationControllers[index],
+            controller: navBarViewModel.animationControllers[navItem],
           ),
         ),
-        label: _navLabels[index],
+        label: navItem.label,
       );
     });
-
-    return Scaffold(
-      body: widget.navigationShell, // 使用 NavigationShell 作为主内容区域
-      bottomNavigationBar: BottomNavigationBar(
-        items: _navItems,
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    // 释放所有动画控制器
-    for (var controller in _animationControllers) {
-      controller?.dispose();
-    }
-    super.dispose();
   }
 }
