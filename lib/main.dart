@@ -1,9 +1,9 @@
+import 'package:coolmall_flutter/app/viewmodels/viewmodels.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:coolmall_flutter/app/bootstrap.dart';
 import 'package:coolmall_flutter/app/router/router.dart';
 import 'package:coolmall_flutter/app/theme/theme.dart';
-import 'package:coolmall_flutter/features/main/viewmodel/nav_bar_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        // 导航栏状态管理
-        ChangeNotifierProvider(create: (_) => NavBarViewModel()),
-        // 可以在这里添加更多的状态管理类
-      ],
+      providers: viewModels,
       child: MaterialApp.router(
         title: 'CoolMall',
         theme: AppTheme.light,
