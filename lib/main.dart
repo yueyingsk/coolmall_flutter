@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:coolmall_flutter/app/bootstrap.dart';
 import 'package:coolmall_flutter/app/router/router.dart';
 import 'package:coolmall_flutter/app/theme/theme.dart';
+import 'package:coolmall_flutter/shared/widgets/refresh/refresh_configuration.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,12 +19,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: viewModels,
-      child: MaterialApp.router(
-        title: 'CoolMall',
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        routerConfig: appRouter,
+      child: AppRefreshConfiguration(
+        child: MaterialApp.router(
+          title: 'CoolMall',
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: ThemeMode.system,
+          routerConfig: appRouter,
+        ),
       ),
     );
   }

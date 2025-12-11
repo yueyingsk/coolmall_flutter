@@ -1,4 +1,6 @@
 import 'package:coolmall_flutter/app/router/app_routes.dart';
+import 'package:coolmall_flutter/core/utils/shared_preferences_util.dart';
+import 'package:coolmall_flutter/features/launch/constants/launch_constants.dart';
 import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -34,6 +36,8 @@ class GuideViewModel extends ChangeNotifier {
   }
 
   void completeGuide(BuildContext context) {
+    // 标记引导页已展示
+    prefsUtil.setBool(LaunchConstants.keyGuideShown, true);
     // 导航到主页
     context.go(AppRoutes.home);
   }
