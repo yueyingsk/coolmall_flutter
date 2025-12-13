@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static final ThemeData light = ThemeData(
-    brightness: Brightness.light,
-    primaryColor: primaryDefault,
     // 其他浅色主题配置
     colorScheme: ColorScheme.light(
       primary: primaryDefault,
       secondary: colorPurple,
       tertiary: colorSuccess,
-      surface: bgWhiteLight,
+      surface: bgGreyLight,
       error: colorDanger,
       onPrimary: textWhite,
       onSecondary: textWhite,
@@ -21,15 +19,13 @@ class AppTheme {
       surfaceTint: primaryDefault,
       surfaceContainer: bgWhiteLight,
       surfaceContainerHigh: bgWhiteLight,
-      surfaceContainerHighest: bgWhiteLight,
+      surfaceContainerHighest: bgContentLight,
     ),
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,
   );
 
   static final ThemeData dark = ThemeData(
-    brightness: Brightness.dark,
-    primaryColor: primaryDefault,
     // 其他深色主题配置
     colorScheme: ColorScheme.dark(
       primary: primaryDefault,
@@ -46,7 +42,7 @@ class AppTheme {
       surfaceTint: bgColorDark,
       surfaceContainer: bgWhiteDark,
       surfaceContainerHigh: bgWhiteDark,
-      surfaceContainerHighest: bgWhiteDark,
+      surfaceContainerHighest: bgContentDark,
     ),
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,

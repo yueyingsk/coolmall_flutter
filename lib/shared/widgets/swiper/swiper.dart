@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:coolmall_flutter/app/theme/color.dart';
 import 'package:flutter/material.dart';
 
 /// 简单的横向切换轮播组件
@@ -9,13 +10,13 @@ import 'package:flutter/material.dart';
 /// @param autoplay 是否自动播放，默认为true
 /// @param interval 自动播放间隔时间，默认为3000ms
 /// @param onTap 点击轮播项回调
-/// @param indicatorType 指示器类型，可选'none'、'dot'、'bar'，默认为'dot'
+/// @param indicatorType 指示器类型，可选'none'、'dot'、'bar'，默认为'bar'
 class SimpleSwiper<T> extends StatefulWidget {
-  final List<T> items;
-  final Widget Function(BuildContext context, int index, T item) content;
+  final List items;
+  final Widget Function(BuildContext context, int index) content;
   final bool autoplay;
   final Duration interval;
-  final void Function(int index, T item)? onTap;
+  final void Function(int index)? onTap;
   final String indicatorType;
 
   const SimpleSwiper({
@@ -25,7 +26,7 @@ class SimpleSwiper<T> extends StatefulWidget {
     this.autoplay = true,
     this.interval = const Duration(milliseconds: 3000),
     this.onTap,
-    this.indicatorType = 'dot',
+    this.indicatorType = 'bar',
   });
 
   @override
@@ -106,7 +107,7 @@ class _SimpleSwiperState extends State<SimpleSwiper> {
 
     if (widget.indicatorType == 'dot') {
       return Positioned(
-        bottom: 16.0,
+        bottom: 10.0,
         left: 0,
         right: 0,
         child: Row(
@@ -117,7 +118,9 @@ class _SimpleSwiperState extends State<SimpleSwiper> {
               height: 8.0,
               margin: const EdgeInsets.symmetric(horizontal: 4.0),
               decoration: BoxDecoration(
-                color: index == _currentPage ? Colors.white : Colors.white54,
+                color: index == _currentPage
+                    ? primaryDefault.withValues(alpha: 0.6)
+                    : primaryDefault.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(4.0),
               ),
             );
@@ -126,31 +129,31 @@ class _SimpleSwiperState extends State<SimpleSwiper> {
       );
     }
 
-    // 默认使用bar类型
+    // 默认使用bar类型（与Compose版本一致）
     return Positioned(
-      bottom: 16.0,
+      bottom: 10.0,
       left: 0,
       right: 0,
       child: Center(
         child: Container(
-          width: 80.0,
-          height: 4.0,
+          width: widget.items.length * 16.0,
+          height: 3.0,
           decoration: BoxDecoration(
-            color: Colors.white54,
+            color: primaryDefault.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(2.0),
           ),
           child: Stack(
             children: [
               AnimatedPositioned(
-                left: _currentPage * (80.0 / widget.items.length),
+                left: _currentPage * 16.0,
                 top: 0,
                 bottom: 0,
-                width: 80.0 / widget.items.length,
+                width: 16.0,
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: primaryDefault.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(2.0),
                   ),
                 ),
@@ -172,10 +175,9 @@ class _SimpleSwiperState extends State<SimpleSwiper> {
           scrollDirection: Axis.horizontal,
           onPageChanged: _onPageChanged,
           itemBuilder: (context, index) {
-            final item = widget.items[index];
             return GestureDetector(
-              onTap: () => widget.onTap?.call(index, item),
-              child: widget.content(context, index, item),
+              onTap: () => widget.onTap?.call(index),
+              child: widget.content(context, index),
             );
           },
         ),

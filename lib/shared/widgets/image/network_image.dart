@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../loading/loading.dart';
 
 /// 带加载状态的网络图片组件
 ///
@@ -9,7 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// @param modifier 应用于整个组件的修饰符
 /// @param size 图片大小，设置宽高相等的尺寸。如果为null，则不设置大小
 /// @param contentScale 图片的内容缩放模式，默认为Crop
-/// @param loadingColor 加载动画的颜色，默认为主题色
+/// @param loadingColor 加载动画的颜色
 /// @param errorColor 错误图标的颜色，默认为灰色
 /// @param onErrorClick 图片加载失败时点击错误图标的回调，如果为null则不显示可点击的图标
 /// @param showBackground 是否显示背景颜色，默认为false
@@ -21,8 +23,8 @@ class NetworkImageWidget extends StatelessWidget {
   final Widget Function(BuildContext)? errorWidget;
   final double? width;
   final double? height;
-  final BoxFit contentScale;
-  final Color loadingColor;
+  final BoxFit fit;
+  final Color? loadingColor;
   final Color errorColor;
   final VoidCallback? onErrorClick;
   final bool showBackground;
@@ -36,8 +38,8 @@ class NetworkImageWidget extends StatelessWidget {
     this.errorWidget,
     this.width,
     this.height,
-    this.contentScale = BoxFit.cover,
-    this.loadingColor = Colors.blue,
+    this.fit = BoxFit.cover,
+    this.loadingColor,
     this.errorColor = Colors.grey,
     this.onErrorClick,
     this.showBackground = false,
@@ -62,28 +64,11 @@ class NetworkImageWidget extends StatelessWidget {
       decoration: containerDecoration,
       child: ClipRRect(
         borderRadius: cornerRadius ?? BorderRadius.zero,
-        child: Image.network(
-          imageUrl,
-          fit: contentScale,
-          loadingBuilder:
-              (
-                BuildContext context,
-                Widget child,
-                ImageChunkEvent? loadingProgress,
-              ) {
-                if (loadingProgress == null) {
-                  // 加载成功
-                  return child;
-                } else {
-                  // 加载中
-                  return _buildLoadingWidget(context);
-                }
-              },
-          errorBuilder:
-              (BuildContext context, Object exception, StackTrace? stackTrace) {
-                // 加载失败
-                return _buildErrorWidget(context);
-              },
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: fit,
+          placeholder: (context, url) => _buildLoadingWidget(context),
+          errorWidget: (context, url, error) => _buildErrorWidget(context),
         ),
       ),
     );
@@ -95,11 +80,7 @@ class NetworkImageWidget extends StatelessWidget {
       return loadingWidget!(context);
     }
 
-    return Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(loadingColor),
-      ),
-    );
+    return Center(child: WeLoading(size: 24.0, color: loadingColor));
   }
 
   /// 构建加载错误状态的Widget
