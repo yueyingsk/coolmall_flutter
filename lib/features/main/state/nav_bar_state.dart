@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/nav_item.dart';
 
 // 导航栏状态管理类，使用Provider进行状态管理
-class NavBarViewModel extends ChangeNotifier {
+class NavBarState extends ChangeNotifier {
   int _selectedIndex = 0;
   int _playingIndex = 0;
   final Map<NavItem, AnimationController?> _animationControllers = {

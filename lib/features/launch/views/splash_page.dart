@@ -1,4 +1,4 @@
-import 'package:coolmall_flutter/features/launch/viewmodel/splash_viewmodel.dart';
+import 'package:coolmall_flutter/features/launch/state/splash_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -86,7 +86,7 @@ class _SplashPageState extends State<SplashPage>
   void _startNavigation() {
     Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) {
-        context.read<SplashViewModel>().checkAndNavigate(context);
+        context.read<SplashState>().checkAndNavigate(context);
       }
     });
   }

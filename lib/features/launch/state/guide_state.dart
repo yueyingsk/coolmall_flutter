@@ -5,7 +5,7 @@ import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class GuideViewModel extends ChangeNotifier {
+class GuideState extends ChangeNotifier {
   int _currentPage = 0;
   bool _isLastPage = false;
   final PageController _pageController = PageController(initialPage: 0);

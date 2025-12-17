@@ -1,11 +1,14 @@
 import 'package:coolmall_flutter/app/theme/color.dart';
-import 'package:coolmall_flutter/shared/widgets/refresh/refresh_layout.dart';
+import 'package:coolmall_flutter/features/main/state/home_state.dart';
+import 'package:coolmall_flutter/shared/widgets/refresh/scrollbar_refresh_layout.dart';
 import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Banner;
 import 'package:flutter_svg/svg.dart';
 import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
 import 'package:coolmall_flutter/shared/widgets/swiper/swiper.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:provider/provider.dart';
+import 'package:coolmall_flutter/features/main/models/home_data.dart';
+import 'package:coolmall_flutter/shared/widgets/waterfall_flow/goods_waterfall_flow.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,33 +18,79 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final RefreshController controller = RefreshController(initialRefresh: false);
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeState>().getHomeData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: RefreshLayout(
-          controller: controller,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: _buildBanner(context)),
-              SliverToBoxAdapter(child: _buildCouponSection(context)),
-              SliverToBoxAdapter(child: _buildCategory(context)),
-              SliverToBoxAdapter(child: _buildFlashSale(context)),
-              SliverToBoxAdapter(child: _buildRecommendGoods(context)),
-              SliverToBoxAdapter(child: _buildAllGoods(context)),
-            ],
-          ),
-        ),
+      body: Consumer<HomeState>(
+        builder: (context, state, child) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: ScrollbarRefreshLayout(
+              onRefresh: state.refreshData,
+              onLoading: state.loadMoreData,
+              controller: state.refreshController,
+              sliverAppBars: [_buildAppBar(context)],
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: _buildBanner(context, state.homeData?.banner ?? []),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _buildCouponSection(
+                      context,
+                      state.homeData?.coupon ?? [],
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _buildCategory(
+                      context,
+                      state.homeData?.category ?? [],
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _buildFlashSale(
+                      context,
+                      state.homeData?.flashSale ?? [],
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _buildAllGoodsTitle(context, "推荐商品"),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _buildRecommendGoods(
+                      context,
+                      state.homeData?.recommend ?? [],
+                    ),
+                  ),
+                  // 全部商品标题
+                  SliverToBoxAdapter(
+                    child: _buildAllGoodsTitle(context, '全部商品'),
+                  ),
+                  // 全部商品列表（瀑布流）
+                  GoodsWaterfallFlow(
+                    goodsList: state.goods,
+                    onItemTap: (goods) {
+                      // 跳转到商品详情页
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
   /// 构建AppBar
-  PreferredSizeWidget? _buildAppBar(BuildContext context) {
-    return AppBar(
+  Widget _buildAppBar(BuildContext context) {
+    return SliverAppBar(
       leadingWidth: 50,
       leading: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -86,7 +135,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
       actions: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -97,30 +145,29 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ],
+      floating: true,
+      pinned: false,
+      snap: false,
+      elevation: 0,
     );
   }
 
   /// 构建轮播图
-  Widget _buildBanner(BuildContext context) {
-    final List<String> bannerImages = [
-      'https://via.placeholder.com/800x400/FF5733/FFFFFF?text=Banner+1',
-      'https://via.placeholder.com/800x400/33FF57/FFFFFF?text=Banner+2',
-      'https://via.placeholder.com/800x400/3357FF/FFFFFF?text=Banner+3',
-    ];
-
+  Widget _buildBanner(BuildContext context, List<Banner> banner) {
     return SizedBox(
       width: double.infinity,
       height: 170,
       child: SimpleSwiper(
-        items: bannerImages,
+        items: banner,
         autoplay: true,
         onTap: (index) {
           // 点击轮播图的回调
         },
         content: (context, index) {
           return NetworkImageWidget(
-            imageUrl: bannerImages[index],
+            imageUrl: banner[index].pic,
             fit: BoxFit.cover,
+            cornerRadius: BorderRadius.circular(12),
           );
         },
       ),
@@ -128,13 +175,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建优惠券区域
-  Widget _buildCouponSection(BuildContext context) {
-    final List<Map<String, dynamic>> coupons = [
-      {'title': '满100减20优惠券', 'id': 1},
-      {'title': '满200减50优惠券', 'id': 2},
-      {'title': '满300减100优惠券', 'id': 3},
-    ];
-
+  Widget _buildCouponSection(BuildContext context, List<Coupon> coupons) {
     return Card(
       elevation: 0,
       color: Colors.white,
@@ -177,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            item['title'],
+                            item.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 14),
@@ -220,51 +261,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建分类区域
-  Widget _buildCategory(BuildContext context) {
-    final List<Map<String, dynamic>> categories = [
-      {
-        'name': '手机',
-        'icon': 'https://via.placeholder.com/50/FF5733/FFFFFF?text=手机',
-        'id': 1,
-      },
-      {
-        'name': '电脑',
-        'icon': 'https://via.placeholder.com/50/33FF57/FFFFFF?text=电脑',
-        'id': 2,
-      },
-      {
-        'name': '家电',
-        'icon': 'https://via.placeholder.com/50/3357FF/FFFFFF?text=家电',
-        'id': 3,
-      },
-      {
-        'name': '服装',
-        'icon': 'https://via.placeholder.com/50/FF33A8/FFFFFF?text=服装',
-        'id': 4,
-      },
-      {
-        'name': '食品',
-        'icon': 'https://via.placeholder.com/50/FFC300/FFFFFF?text=食品',
-        'id': 5,
-      },
-      {
-        'name': '美妆',
-        'icon': 'https://via.placeholder.com/50/900C3F/FFFFFF?text=美妆',
-        'id': 6,
-      },
-      {
-        'name': '运动',
-        'icon': 'https://via.placeholder.com/50/1ABC9C/FFFFFF?text=运动',
-        'id': 7,
-      },
-      {
-        'name': '母婴',
-        'icon': 'https://via.placeholder.com/50/3498DB/FFFFFF?text=母婴',
-        'id': 8,
-      },
-      // 这里可以添加更多分类，演示第二行不足5个的情况
-    ];
-
+  Widget _buildCategory(BuildContext context, List<Banner> categories) {
     // 计算需要的行数
     final int rows = (categories.length / 5).ceil();
 
@@ -298,10 +295,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建单个分类项
-  Widget _buildCategoryItem(
-    BuildContext context,
-    Map<String, dynamic>? category,
-  ) {
+  Widget _buildCategoryItem(BuildContext context, Banner? category) {
     // 如果是空白项，返回空容器
     if (category == null) {
       return Container();
@@ -316,51 +310,25 @@ class _HomePageState extends State<HomePage> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).colorScheme.surfaceVariant,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             child: NetworkImageWidget(
               width: 60,
               height: 60,
-              imageUrl: category['icon'],
+              imageUrl: category.pic,
               fit: BoxFit.cover,
+              cornerRadius: BorderRadius.circular(8),
             ),
           ),
           const SizedBox(height: 4),
-          Text(category['name'], style: TextStyle(fontSize: 14)),
+          Text(category.name ?? '', style: TextStyle(fontSize: 14)),
         ],
       ),
     );
   }
 
-  final List<Map<String, dynamic>> goods = [
-    {
-      'name': 'iPhone 15',
-      'price': '5999',
-      'image': 'https://via.placeholder.com/100x100',
-      'id': 1,
-    },
-    {
-      'name': 'Samsung S24',
-      'price': '4999',
-      'image': 'https://via.placeholder.com/100x100',
-      'id': 2,
-    },
-    {
-      'name': 'Xiaomi 14',
-      'price': '3999',
-      'image': 'https://via.placeholder.com/100x100',
-      'id': 3,
-    },
-    {
-      'name': 'Huawei P60',
-      'price': '4999',
-      'image': 'https://via.placeholder.com/100x100',
-      'id': 4,
-    },
-  ];
-
   /// 构建限时精选区域
-  Widget _buildFlashSale(BuildContext context) {
+  Widget _buildFlashSale(BuildContext context, List<Goods> goods) {
     return Card(
       elevation: 0,
       color: Colors.white,
@@ -398,12 +366,12 @@ class _HomePageState extends State<HomePage> {
           Divider(height: 0.5, color: Theme.of(context).colorScheme.outline),
           Container(
             padding: EdgeInsetsGeometry.all(12),
-            height: 192,
+            height: 195,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: goods.length,
               itemBuilder: (context, index) {
-                return _buildFlashSaleItem(context, index);
+                return _buildFlashSaleItem(context, index, goods);
               },
             ),
           ),
@@ -412,7 +380,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFlashSaleItem(BuildContext context, int index) {
+  Widget _buildFlashSaleItem(
+    BuildContext context,
+    int index,
+    List<Goods> goods,
+  ) {
     return GestureDetector(
       onTap: () {
         // 跳转到商品详情页
@@ -426,27 +398,22 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: NetworkImageWidget(
-                imageUrl: goods[index]['image'],
-                width: 120,
-                height: 120,
-                fit: BoxFit.cover,
-              ),
+            NetworkImageWidget(
+              imageUrl: goods[index].mainPic,
+              width: 120,
+              height: 120,
+              fit: BoxFit.cover,
+              cornerRadius: BorderRadius.circular(8),
             ),
             const SizedBox(height: 4),
             Text(
-              goods[index]['name'],
+              goods[index].title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 4),
-            PriceText(
-              price: int.parse(goods[index]['price']),
-              integerTextSize: 14,
-            ),
+            PriceText(price: goods[index].price, integerTextSize: 14),
           ],
         ),
       ),
@@ -454,55 +421,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建推荐商品区域
-  Widget _buildRecommendGoods(BuildContext context) {
-    final List<Map<String, dynamic>> goods = [
-      {
-        'name': '小米手环8',
-        'price': '299',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 1,
-      },
-      {
-        'name': 'AirPods Pro',
-        'price': '1999',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 2,
-      },
-      {
-        'name': 'MacBook Air',
-        'price': '7999',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 3,
-      },
-    ];
-
+  Widget _buildRecommendGoods(BuildContext context, List<Goods> goods) {
     return Column(
       children: [
-        SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(width: 4),
-            Container(
-              width: 4,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '推荐商品',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8),
         for (var goodsItem in goods)
           GestureDetector(
             onTap: () {
@@ -516,14 +437,12 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8),
                 child: Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: NetworkImageWidget(
-                        imageUrl: goodsItem['image'],
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
+                    NetworkImageWidget(
+                      imageUrl: goodsItem.mainPic,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      cornerRadius: BorderRadius.circular(8),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -531,7 +450,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            goodsItem['name'],
+                            goodsItem.title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodyLarge,
@@ -539,7 +458,7 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 4),
                           Expanded(
                             child: Text(
-                              goodsItem['name'],
+                              goodsItem.subTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -552,9 +471,9 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              PriceText(price: int.parse(goodsItem['price'])),
+                              PriceText(price: goodsItem.price),
                               Text(
-                                '已售666件',
+                                '已售${goodsItem.sold}件',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Theme.of(context).colorScheme.onSurface
@@ -575,49 +494,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 全部商品
-  Widget _buildAllGoods(BuildContext context) {
-    final List<Map<String, dynamic>> goods = [
-      {
-        'name': '商品1',
-        'price': '100',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 1,
-      },
-      {
-        'name': '商品2',
-        'price': '200',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 2,
-      },
-      {
-        'name': '商品3',
-        'price': '300',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 3,
-      },
-      {
-        'name': '商品4',
-        'price': '400',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 4,
-      },
-      {
-        'name': '商品5',
-        'price': '500',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 5,
-      },
-      {
-        'name': '商品6',
-        'price': '600',
-        'image': 'https://via.placeholder.com/100x100',
-        'id': 6,
-      },
-    ];
-
+  Widget? _buildAllGoodsTitle(BuildContext context, String title) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 8),
         Row(
@@ -634,7 +512,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(width: 8),
             Text(
-              '全部商品',
+              title,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -644,78 +522,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         SizedBox(height: 8),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 6,
-            crossAxisSpacing: 6,
-          ),
-          itemCount: goods.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 0,
-              color: bgWhiteLight,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: GestureDetector(
-                  onTap: () {
-                    // 跳转到商品详情页
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: NetworkImageWidget(
-                            width: double.infinity,
-                            imageUrl: goods[index]['image'],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        goods[index]['name'],
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      Text(
-                        goods[index]['name'],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: textTertiaryLight,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          PriceText(price: int.parse(goods[index]['price'])),
-                          Text(
-                            '已售666件',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
       ],
     );
   }

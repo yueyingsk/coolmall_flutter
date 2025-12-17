@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.splash,
+  initialLocation: AppRoutes.home,
   routes: [
     // 闪屏页路由
     splashRoute,

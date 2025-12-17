@@ -1,5 +1,5 @@
 import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
-import 'package:coolmall_flutter/features/launch/viewmodel/guide_viewmodel.dart';
+import 'package:coolmall_flutter/features/launch/state/guide_state.dart';
 import 'package:coolmall_flutter/features/launch/widgets/guide_content_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,13 +20,13 @@ class _GuidePageState extends State<GuidePage> {
 
   @override
   void dispose() {
-    context.read<GuideViewModel>().pageController.dispose();
+    context.read<GuideState>().pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GuideViewModel>(
+    return Consumer<GuideState>(
       builder: (context, viewModel, child) {
         return GuideContentView(
           guidePages: guidePageDataList,

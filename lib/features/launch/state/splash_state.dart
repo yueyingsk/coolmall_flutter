@@ -4,7 +4,7 @@ import 'package:coolmall_flutter/features/launch/constants/launch_constants.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class SplashViewModel extends ChangeNotifier {
+class SplashState extends ChangeNotifier {
   void checkAndNavigate(BuildContext context) {
     // 检查是否展示过引导页
     if (!prefsUtil.getBool(

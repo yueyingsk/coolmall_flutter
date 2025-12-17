@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../models/nav_item.dart';
-import '../viewmodel/nav_bar_viewmodel.dart';
+import '../state/nav_bar_state.dart';
 
 class MainPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -20,7 +20,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     // 获取导航栏状态管理
-    final navBarViewModel = context.read<NavBarViewModel>();
+    final navBarViewModel = context.read<NavBarState>();
     // 初始化导航项动画
     // Future.microtask(() {
     //   // 播放首页动画
@@ -34,7 +34,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   // 导航项点击事件处理
-  void _onItemTapped(int index, NavBarViewModel navBarViewModel) {
+  void _onItemTapped(int index, NavBarState navBarViewModel) {
     // 使用状态管理播放动画
     navBarViewModel.playAnimation(index);
     navBarViewModel.setSelectedIndex(index);
@@ -49,7 +49,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     // 获取导航栏状态管理
-    final navBarViewModel = context.read<NavBarViewModel>();
+    final navBarViewModel = context.read<NavBarState>();
 
     return Scaffold(
       body: widget.navigationShell, // 使用 NavigationShell 作为主内容区域
@@ -76,7 +76,7 @@ class _MainPageState extends State<MainPage> {
 
   List<BottomNavigationBarItem> _getNavItems(
     BuildContext context,
-    NavBarViewModel navBarViewModel,
+    NavBarState navBarViewModel,
   ) {
     return List.generate(NavItem.values.length, (index) {
       final navItem = NavItem.values[index];
