@@ -1,3 +1,4 @@
+import 'package:coolmall_flutter/app/router/app_routes.dart';
 import 'package:coolmall_flutter/app/theme/color.dart';
 import 'package:coolmall_flutter/features/main/state/home_state.dart';
 import 'package:coolmall_flutter/shared/widgets/refresh/scrollbar_refresh_layout.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart' hide Banner;
 import 'package:flutter_svg/svg.dart';
 import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
 import 'package:coolmall_flutter/shared/widgets/swiper/swiper.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:coolmall_flutter/features/main/models/home_data.dart';
 import 'package:coolmall_flutter/shared/widgets/waterfall_flow/goods_waterfall_flow.dart';
@@ -25,6 +27,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    context.read<HomeState>().refreshController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<HomeState>(
@@ -41,18 +49,21 @@ class _HomePageState extends State<HomePage> {
                   SliverToBoxAdapter(
                     child: _buildBanner(context, state.homeData?.banner ?? []),
                   ),
+                  SliverToBoxAdapter(child: SizedBox(height: 5)),
                   SliverToBoxAdapter(
                     child: _buildCouponSection(
                       context,
                       state.homeData?.coupon ?? [],
                     ),
                   ),
+                  SliverToBoxAdapter(child: SizedBox(height: 5)),
                   SliverToBoxAdapter(
                     child: _buildCategory(
                       context,
                       state.homeData?.category ?? [],
                     ),
                   ),
+                  SliverToBoxAdapter(child: SizedBox(height: 5)),
                   SliverToBoxAdapter(
                     child: _buildFlashSale(
                       context,
@@ -89,15 +100,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建AppBar
+  /// 构建AppBar
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
       leadingWidth: 50,
       leading: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: SvgPicture.asset(
-          width: 34,
-          height: 34,
-          'assets/drawable/ic_logo.svg',
+        child: Hero(
+          tag: 'app_logo', // 使用相同的Hero tag
+          child: SizedBox(
+            width: 34,
+            height: 34,
+            child: SvgPicture.asset(
+              width: 34,
+              height: 34,
+              'assets/drawable/ic_logo.svg',
+            ),
+          ),
         ),
       ),
       centerTitle: true,
@@ -156,7 +175,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBanner(BuildContext context, List<Banner> banner) {
     return SizedBox(
       width: double.infinity,
-      height: 170,
+      height: 190,
       child: SimpleSwiper(
         items: banner,
         autoplay: true,
@@ -245,6 +264,7 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () {
                 // 显示优惠券弹窗
+                context.push(AppRoutes.guide);
               },
               child: Text(
                 '领取',
@@ -305,24 +325,20 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         // 跳转到分类页
       },
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-            child: NetworkImageWidget(
-              width: 60,
-              height: 60,
+      child: Padding(
+        padding: EdgeInsets.all(4),
+        child: Column(
+          children: [
+            NetworkImageWidget(
+              width: 50,
+              height: 50,
               imageUrl: category.pic,
               fit: BoxFit.cover,
-              cornerRadius: BorderRadius.circular(8),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(category.name ?? '', style: TextStyle(fontSize: 14)),
-        ],
+            const SizedBox(height: 4),
+            Text(category.name ?? '', style: TextStyle(fontSize: 14)),
+          ],
+        ),
       ),
     );
   }
@@ -497,7 +513,7 @@ class _HomePageState extends State<HomePage> {
   Widget? _buildAllGoodsTitle(BuildContext context, String title) {
     return Column(
       children: [
-        SizedBox(height: 8),
+        SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -521,7 +537,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        SizedBox(height: 8),
+        SizedBox(height: 10),
       ],
     );
   }

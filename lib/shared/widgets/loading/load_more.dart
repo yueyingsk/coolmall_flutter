@@ -148,7 +148,7 @@ class LoadMore extends StatelessWidget {
           Expanded(
             child: Divider(
               height: 0.5,
-              color: Theme.of(context).colorScheme.outline,
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.2),
             ),
           ),
           const SizedBox(width: 8.0),
@@ -157,14 +157,14 @@ class LoadMore extends StatelessWidget {
             height: 4.0,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.outline,
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.2),
             ),
           ),
           const SizedBox(width: 8.0),
           Expanded(
             child: Divider(
               height: 0.5,
-              color: Theme.of(context).colorScheme.outline,
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.2),
             ),
           ),
         ],

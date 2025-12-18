@@ -1,21 +1,15 @@
+import 'package:coolmall_flutter/features/main/state/main_state.dart';
 import 'package:coolmall_flutter/features/main/views/main_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-import 'home_route.dart';
-import 'category_route.dart';
-import 'cart_route.dart';
-import 'mine_route.dart';
+import '../app_routes.dart';
 
-// 定义StatefulShellRoute
-final mainShell = StatefulShellRoute.indexedStack(
-  builder: (context, state, navigationShell) {
-    // 正确传递navigationShell参数
-    return MainPage(navigationShell: navigationShell);
-  },
-  branches: [
-    StatefulShellBranch(routes: [homeRoute]),
-    StatefulShellBranch(routes: [categoryRoute]),
-    StatefulShellBranch(routes: [cartRoute]),
-    StatefulShellBranch(routes: [mineRoute]),
-  ],
+// 定义主页面路由
+final mainRoute = GoRoute(
+  path: AppRoutes.main,
+  builder: (context, state) => ChangeNotifierProvider(
+    create: (_) => MainState(),
+    child: const MainPage(),
+  ),
 );

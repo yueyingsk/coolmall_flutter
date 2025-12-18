@@ -1,15 +1,12 @@
 import 'package:coolmall_flutter/app/theme/color.dart';
+import 'package:coolmall_flutter/features/main/state/main_state.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../models/nav_item.dart';
-import '../state/nav_bar_state.dart';
 
 class MainPage extends StatefulWidget {
-  final StatefulNavigationShell navigationShell;
-
-  const MainPage({super.key, required this.navigationShell});
+  const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -20,63 +17,65 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     // 获取导航栏状态管理
-    final navBarViewModel = context.read<NavBarState>();
-    // 初始化导航项动画
-    // Future.microtask(() {
+    final navBarViewModel = context.read<MainState>();
+
+    // 使用addPostFrameCallback将动画播放延迟到当前帧绘制完成后
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   // 播放首页动画
-    //   navBarViewModel.playAnimation(widget.navigationShell.currentIndex);
+    //   navBarViewModel.playAnimation(navBarViewModel.selectedIndex);
     // });
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       // 播放首页动画
-      navBarViewModel.playAnimation(widget.navigationShell.currentIndex);
-      setState(() {});
+      navBarViewModel.playAnimation(navBarViewModel.selectedIndex);
     });
-  }
-
-  // 导航项点击事件处理
-  void _onItemTapped(int index, NavBarState navBarViewModel) {
-    // 使用状态管理播放动画
-    navBarViewModel.playAnimation(index);
-    navBarViewModel.setSelectedIndex(index);
-
-    // 使用 NavigationShell 切换页面
-    widget.navigationShell.goBranch(
-      index,
-      initialLocation: index == widget.navigationShell.currentIndex,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // 获取导航栏状态管理
-    final navBarViewModel = context.read<NavBarState>();
-
-    return Scaffold(
-      body: widget.navigationShell, // 使用 NavigationShell 作为主内容区域
-      bottomNavigationBar: BottomNavigationBar(
-        items: _getNavItems(context, navBarViewModel),
-        currentIndex: widget.navigationShell.currentIndex,
-        onTap: (index) {
-          if (index != widget.navigationShell.currentIndex) {
-            _onItemTapped(index, navBarViewModel);
-          }
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        selectedLabelStyle: Theme.of(
-          context,
-        ).textTheme.bodySmall?.copyWith(color: primaryDefault),
-        unselectedLabelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-        ),
-        elevation: 0,
-      ),
+    return Consumer<MainState>(
+      builder: (context, state, child) {
+        return Scaffold(
+          body: PageView(
+            controller: state.pageController,
+            onPageChanged: (index) {
+              // 页面滑动时更新状态（仅用于用户手动滑动的情况）
+              if (index != state.selectedIndex) {
+                state.setSelectedIndex(index);
+                state.playAnimation(index);
+              }
+            },
+            physics: const BouncingScrollPhysics(), // 添加滑动效果
+            children: state.pages,
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: _getNavItems(context, state),
+            currentIndex: state.selectedIndex,
+            onTap: (index) {
+              if (index != state.selectedIndex) {
+                state.switchPage(index);
+              }
+            },
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            selectedLabelStyle: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: primaryDefault),
+            unselectedLabelStyle: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+            elevation: 0,
+          ),
+        );
+      },
     );
   }
 
   List<BottomNavigationBarItem> _getNavItems(
     BuildContext context,
-    NavBarState navBarViewModel,
+    MainState state,
   ) {
     return List.generate(NavItem.values.length, (index) {
       final navItem = NavItem.values[index];
@@ -97,9 +96,9 @@ class _MainPageState extends State<MainPage> {
               );
 
               // 将动画控制器保存到状态管理中
-              navBarViewModel.setAnimationController(navItem, controller);
+              state.setAnimationController(navItem, controller);
             },
-            controller: navBarViewModel.animationControllers[navItem],
+            controller: state.animationControllers[navItem],
           ),
         ),
         label: navItem.label,

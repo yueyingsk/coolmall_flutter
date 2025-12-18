@@ -45,27 +45,6 @@ class GuideContentView extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // 顶部跳过按钮
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 16.0,
-            right: 16.0,
-            child: TextButton(
-              onPressed: onSkipClick,
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 8.0,
-                ),
-              ),
-              child: Text(
-                '跳过',
-                style: TextStyle(
-                  fontSize: 12.0,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ),
 
           // 主要内容区域
           Column(
@@ -120,6 +99,28 @@ class GuideContentView extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+
+          // 顶部跳过按钮
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16.0,
+            right: 16.0,
+            child: TextButton(
+              onPressed: onSkipClick,
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 8.0,
+                ),
+              ),
+              child: Text(
+                '跳过',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           ),
         ],
       ),

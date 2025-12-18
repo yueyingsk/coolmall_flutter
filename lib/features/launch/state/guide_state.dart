@@ -39,6 +39,6 @@ class GuideState extends ChangeNotifier {
     // 标记引导页已展示
     prefsUtil.setBool(LaunchConstants.keyGuideShown, true);
     // 导航到主页
-    context.go(AppRoutes.home);
+    context.go(AppRoutes.main);
   }
 }

@@ -34,19 +34,19 @@ class _SplashPageState extends State<SplashPage>
     super.initState();
     // 初始化动画控制器
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
     // 配置 Logo 动画
-    _logoOffsetY = Tween<double>(begin: 160.0, end: 0.0).animate(
+    _logoOffsetY = Tween<double>(begin: 200.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.0, 0.83), // 1000ms / 1200ms
       ),
     );
 
-    _logoRotation = Tween<double>(begin: -15.0, end: 0.0).animate(
+    _logoRotation = Tween<double>(begin: -30.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.0, 0.83),
@@ -84,7 +84,7 @@ class _SplashPageState extends State<SplashPage>
   }
 
   void _startNavigation() {
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         context.read<SplashState>().checkAndNavigate(context);
       }
@@ -164,11 +164,18 @@ class _SplashPageState extends State<SplashPage>
                 angle: _logoRotation.value * 3.1415926535 / 180, // 转换为弧度
                 child: Opacity(
                   opacity: _logoAlpha.value,
-                  child: SvgPicture.asset(
-                    'assets/drawable/ic_logo.svg',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.contain,
+                  child: Hero(
+                    tag: 'app_logo', // 添加相同的Hero tag
+                    child: SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: SvgPicture.asset(
+                        'assets/drawable/ic_logo.svg',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                 ),
               ),
