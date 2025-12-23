@@ -2,9 +2,7 @@
 //
 //     final goodsPageData = goodsPageDataFromJson(jsonString);
 
-
-import 'package:coolmall_flutter/features/main/models/home_data.dart';
-
+import 'package:coolmall_flutter/features/main/model/home_data.dart';
 
 class GoodsPageData {
   final List<Goods> list;

@@ -12,6 +12,7 @@ class ScrollbarRefreshLayout extends StatelessWidget {
   final Widget? header;
   final Widget? footer;
   final List<Widget> sliverAppBars;
+  final ScrollController? scrollController; // 外部传入的滚动控制器
 
   const ScrollbarRefreshLayout({
     super.key,
@@ -22,13 +23,14 @@ class ScrollbarRefreshLayout extends StatelessWidget {
     this.header,
     this.footer,
     required this.sliverAppBars,
+    this.scrollController, // 新增参数
   });
 
   @override
   Widget build(BuildContext context) {
     return NestedScrollView(
       // 设置滚动控制器以协调嵌套滚动
-      controller: ScrollController(),
+      controller: scrollController ?? ScrollController(),
       //让 SliverAppBar 跟随手指平滑滚动
       floatHeaderSlivers: true,
       // 外部滚动视图只包含SliverAppBar
@@ -89,7 +91,9 @@ class ScrollbarRefreshLayout extends StatelessWidget {
                 height: 24.0,
                 child: MiLoadingMobile(
                   size: 24.0,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                   isAnimating: isAnimating,
                 ),
               ),
@@ -98,7 +102,9 @@ class ScrollbarRefreshLayout extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontSize: 14.0,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.75),
                 ),
               ),
             ],

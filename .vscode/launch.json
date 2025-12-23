@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "args": ["run", "-d", "edge", "--web-browser-flag", "--disable-web-security"],
+            "name": "flutter edge",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "coolmall_flutter (Flutter Edge)",
+            "program": "lib/main.dart",
+            "deviceId": "edge",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}

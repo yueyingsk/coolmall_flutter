@@ -1,4 +1,4 @@
-import 'package:coolmall_flutter/features/main/views/category_page.dart';
+import 'package:coolmall_flutter/features/main/view/category_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app_routes.dart';

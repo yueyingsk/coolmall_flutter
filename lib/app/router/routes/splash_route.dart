@@ -1,5 +1,5 @@
 import 'package:coolmall_flutter/features/launch/state/splash_state.dart';
-import 'package:coolmall_flutter/features/launch/views/splash_page.dart';
+import 'package:coolmall_flutter/features/launch/view/splash_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

@@ -3,7 +3,7 @@ import 'package:coolmall_flutter/features/main/state/main_state.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import '../models/nav_item.dart';
+import '../model/nav_item.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

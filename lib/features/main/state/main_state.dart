@@ -1,11 +1,11 @@
 import 'package:coolmall_flutter/features/main/state/home_state.dart';
-import 'package:coolmall_flutter/features/main/views/cart_page.dart';
-import 'package:coolmall_flutter/features/main/views/category_page.dart';
-import 'package:coolmall_flutter/features/main/views/home_page.dart';
-import 'package:coolmall_flutter/features/main/views/mine_page.dart';
+import 'package:coolmall_flutter/features/main/view/cart_page.dart';
+import 'package:coolmall_flutter/features/main/view/category_page.dart';
+import 'package:coolmall_flutter/features/main/view/home_page.dart';
+import 'package:coolmall_flutter/features/main/view/mine_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/nav_item.dart';
+import '../model/nav_item.dart';
 
 // 主页状态管理类，使用Provider进行状态管理
 class MainState extends ChangeNotifier {
@@ -28,11 +28,11 @@ class MainState extends ChangeNotifier {
       _keepAlive(
         ChangeNotifierProvider(
           create: (_) => HomeState(),
-          child:  const HomePage(),
+          child: const HomePage(),
         ),
       ),
-      _keepAlive( const CategoryPage()),
-      _keepAlive( const CartPage()),
+      _keepAlive(const CategoryPage()),
+      _keepAlive(const CartPage()),
       _keepAlive(const MinePage()),
     ];
   }
@@ -122,7 +122,7 @@ class MainState extends ChangeNotifier {
 // KeepAlive包装组件，防止页面重建
 class KeepAliveWrapper extends StatefulWidget {
   final Widget child;
-  const KeepAliveWrapper({Key? key, required this.child}) : super(key: key);
+  const KeepAliveWrapper({super.key, required this.child});
 
   @override
   State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();

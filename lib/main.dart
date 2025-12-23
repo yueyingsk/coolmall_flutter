@@ -1,4 +1,4 @@
-import 'package:coolmall_flutter/app/states/states.dart';
+import 'package:coolmall_flutter/app/state/states.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:coolmall_flutter/app/bootstrap.dart';

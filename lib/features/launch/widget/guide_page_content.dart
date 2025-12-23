@@ -1,4 +1,4 @@
-import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
+import 'package:coolmall_flutter/features/launch/model/guide_page_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -35,10 +35,7 @@ class GuidePageContent extends StatelessWidget {
           Text(
             pageData.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 18.0, 
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 24.0),
@@ -49,8 +46,10 @@ class GuidePageContent extends StatelessWidget {
               pageData.description,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14.0, 
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+                fontSize: 14.0,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.75),
                 height: 1.7,
               ),
             ),

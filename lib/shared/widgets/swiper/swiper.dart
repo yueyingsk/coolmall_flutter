@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 /// @param interval 自动播放间隔时间，默认为3000ms
 /// @param onTap 点击轮播项回调
 /// @param indicatorType 指示器类型，可选'none'、'dot'、'bar'，默认为'bar'
+/// @param cornerRadius 轮播项的圆角半径，默认为null（无圆角）
 class SimpleSwiper<T> extends StatefulWidget {
   final List items;
   final Widget Function(BuildContext context, int index) content;
@@ -18,6 +19,7 @@ class SimpleSwiper<T> extends StatefulWidget {
   final Duration interval;
   final void Function(int index)? onTap;
   final String indicatorType;
+  final BorderRadius? cornerRadius;
 
   const SimpleSwiper({
     super.key,
@@ -27,6 +29,7 @@ class SimpleSwiper<T> extends StatefulWidget {
     this.interval = const Duration(milliseconds: 3000),
     this.onTap,
     this.indicatorType = 'bar',
+    this.cornerRadius,
   });
 
   @override
@@ -167,22 +170,25 @@ class _SimpleSwiperState extends State<SimpleSwiper> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        PageView.builder(
-          controller: _controller,
-          itemCount: widget.items.length,
-          scrollDirection: Axis.horizontal,
-          onPageChanged: _onPageChanged,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () => widget.onTap?.call(index),
-              child: widget.content(context, index),
-            );
-          },
-        ),
-        _buildIndicator(),
-      ],
+    return ClipRRect(
+      borderRadius: widget.cornerRadius ?? BorderRadius.zero,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _controller,
+            itemCount: widget.items.length,
+            scrollDirection: Axis.horizontal,
+            onPageChanged: _onPageChanged,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () => widget.onTap?.call(index),
+                child: widget.content(context, index),
+              );
+            },
+          ),
+          _buildIndicator(),
+        ],
+      ),
     );
   }
 }

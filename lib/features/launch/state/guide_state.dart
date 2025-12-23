@@ -1,7 +1,7 @@
 import 'package:coolmall_flutter/app/router/app_routes.dart';
 import 'package:coolmall_flutter/core/utils/shared_preferences_util.dart';
-import 'package:coolmall_flutter/features/launch/constants/launch_constants.dart';
-import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
+import 'package:coolmall_flutter/features/launch/constant/launch_constants.dart';
+import 'package:coolmall_flutter/features/launch/model/guide_page_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

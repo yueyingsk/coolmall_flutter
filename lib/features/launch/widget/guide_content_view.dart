@@ -1,7 +1,7 @@
 import 'package:coolmall_flutter/app/theme/color.dart';
-import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
-import 'package:coolmall_flutter/features/launch/widgets/guide_page_content.dart';
-import 'package:coolmall_flutter/features/launch/widgets/page_indicator.dart';
+import 'package:coolmall_flutter/features/launch/model/guide_page_data.dart';
+import 'package:coolmall_flutter/features/launch/widget/guide_page_content.dart';
+import 'package:coolmall_flutter/features/launch/widget/page_indicator.dart';
 import 'package:flutter/material.dart';
 
 /// 引导页主内容组件
@@ -45,7 +45,6 @@ class GuideContentView extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-
           // 主要内容区域
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

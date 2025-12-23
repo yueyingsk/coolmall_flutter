@@ -1,4 +1,4 @@
-import 'package:coolmall_flutter/app/states/app_state.dart';
+import 'package:coolmall_flutter/app/state/app_state.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 

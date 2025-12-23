@@ -1,6 +1,6 @@
-import 'package:coolmall_flutter/features/launch/models/guide_page_data.dart';
+import 'package:coolmall_flutter/features/launch/model/guide_page_data.dart';
 import 'package:coolmall_flutter/features/launch/state/guide_state.dart';
-import 'package:coolmall_flutter/features/launch/widgets/guide_content_view.dart';
+import 'package:coolmall_flutter/features/launch/widget/guide_content_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

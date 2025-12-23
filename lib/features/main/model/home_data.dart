@@ -5,12 +5,12 @@
 /// 首页数据模型
 class HomeData {
   final List<Coupon> coupon;
-  final List<Banner> banner;
+  final List<Category> banner;
   final List<Goods> goods;
   final List<Goods> flashSale;
   final List<Goods> recommend;
-  final List<Banner> categoryAll;
-  final List<Banner> category;
+  final List<Category> categoryAll;
+  final List<Category> category;
 
   HomeData({
     required this.coupon,
@@ -24,7 +24,9 @@ class HomeData {
 
   factory HomeData.fromJson(Map<String, dynamic> json) => HomeData(
     coupon: List<Coupon>.from(json["coupon"].map((x) => Coupon.fromJson(x))),
-    banner: List<Banner>.from(json["banner"].map((x) => Banner.fromJson(x))),
+    banner: List<Category>.from(
+      json["banner"].map((x) => Category.fromJson(x)),
+    ),
     goods: List<Goods>.from(json["goods"].map((x) => Goods.fromJson(x))),
     flashSale: List<Goods>.from(
       json["flashSale"].map((x) => Goods.fromJson(x)),
@@ -32,11 +34,11 @@ class HomeData {
     recommend: List<Goods>.from(
       json["recommend"].map((x) => Goods.fromJson(x)),
     ),
-    categoryAll: List<Banner>.from(
-      json["categoryAll"].map((x) => Banner.fromJson(x)),
+    categoryAll: List<Category>.from(
+      json["categoryAll"].map((x) => Category.fromJson(x)),
     ),
-    category: List<Banner>.from(
-      json["category"].map((x) => Banner.fromJson(x)),
+    category: List<Category>.from(
+      json["category"].map((x) => Category.fromJson(x)),
     ),
   );
 
@@ -51,7 +53,7 @@ class HomeData {
   };
 }
 
-class Banner {
+class Category {
   final int id;
   final DateTime createTime;
   final DateTime updateTime;
@@ -63,7 +65,7 @@ class Banner {
   final String? name;
   final int? parentId;
 
-  Banner({
+  Category({
     required this.id,
     required this.createTime,
     required this.updateTime,
@@ -76,7 +78,7 @@ class Banner {
     this.parentId,
   });
 
-  factory Banner.fromJson(Map<String, dynamic> json) => Banner(
+  factory Category.fromJson(Map<String, dynamic> json) => Category(
     id: json["id"],
     createTime: DateTime.parse(json["createTime"]),
     updateTime: DateTime.parse(json["updateTime"]),

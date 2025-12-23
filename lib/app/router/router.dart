@@ -1,3 +1,4 @@
+import 'package:coolmall_flutter/app/router/routes/goods_category.dart';
 import 'package:coolmall_flutter/app/router/routes/guide_route.dart';
 import 'package:coolmall_flutter/app/router/routes/main_route.dart';
 import 'package:coolmall_flutter/app/router/routes/splash_route.dart';
@@ -14,5 +15,7 @@ final GoRouter appRouter = GoRouter(
     guideRoute,
     // 主路由（包含底部导航栏）
     mainRoute,
+    // 商品分类路由
+    goodsCategoryRoute,
   ],
 );

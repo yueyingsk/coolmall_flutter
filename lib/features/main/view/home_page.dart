@@ -3,14 +3,14 @@ import 'package:coolmall_flutter/app/theme/color.dart';
 import 'package:coolmall_flutter/features/main/state/home_state.dart';
 import 'package:coolmall_flutter/shared/widgets/refresh/scrollbar_refresh_layout.dart';
 import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
+import 'package:coolmall_flutter/shared/widgets/waterfall_flow/sliver_goods_waterfall_flow.dart';
 import 'package:flutter/material.dart' hide Banner;
 import 'package:flutter_svg/svg.dart';
 import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
 import 'package:coolmall_flutter/shared/widgets/swiper/swiper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:coolmall_flutter/features/main/models/home_data.dart';
-import 'package:coolmall_flutter/shared/widgets/waterfall_flow/goods_waterfall_flow.dart';
+import 'package:coolmall_flutter/features/main/model/home_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -61,6 +61,10 @@ class _HomePageState extends State<HomePage> {
                     child: _buildCategory(
                       context,
                       state.homeData?.category ?? [],
+                      (category) {
+                        // 处理分类项点击事件
+                        state.toGoodsCategoryPage(context, category.id);
+                      },
                     ),
                   ),
                   SliverToBoxAdapter(child: SizedBox(height: 5)),
@@ -84,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                     child: _buildAllGoodsTitle(context, '全部商品'),
                   ),
                   // 全部商品列表（瀑布流）
-                  GoodsWaterfallFlow(
+                  SliverGoodsWaterfallFlow(
                     goodsList: state.goods,
                     onItemTap: (goods) {
                       // 跳转到商品详情页
@@ -172,7 +176,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建轮播图
-  Widget _buildBanner(BuildContext context, List<Banner> banner) {
+  Widget _buildBanner(BuildContext context, List<Category> banner) {
     return SizedBox(
       width: double.infinity,
       height: 190,
@@ -182,6 +186,7 @@ class _HomePageState extends State<HomePage> {
         onTap: (index) {
           // 点击轮播图的回调
         },
+        cornerRadius: BorderRadius.circular(12),
         content: (context, index) {
           return NetworkImageWidget(
             imageUrl: banner[index].pic,
@@ -281,7 +286,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建分类区域
-  Widget _buildCategory(BuildContext context, List<Banner> categories) {
+  Widget _buildCategory(
+    BuildContext context,
+    List<Category> categories,
+    ValueChanged<Category>? onTap,
+  ) {
     // 计算需要的行数
     final int rows = (categories.length / 5).ceil();
 
@@ -303,7 +312,8 @@ class _HomePageState extends State<HomePage> {
                         context,
                         row * 5 + col < categories.length
                             ? categories[row * 5 + col]
-                            : null, // 传递null表示空白项
+                            : null,
+                        onTap, // 传递null表示空白项
                       ),
                     ),
                 ],
@@ -315,16 +325,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建单个分类项
-  Widget _buildCategoryItem(BuildContext context, Banner? category) {
+  Widget _buildCategoryItem(
+    BuildContext context,
+    Category? category,
+    ValueChanged<Category>? onTap,
+  ) {
     // 如果是空白项，返回空容器
     if (category == null) {
       return Container();
     }
 
     return GestureDetector(
-      onTap: () {
-        // 跳转到分类页
-      },
+      onTap: () => onTap?.call(category),
       child: Padding(
         padding: EdgeInsets.all(4),
         child: Column(

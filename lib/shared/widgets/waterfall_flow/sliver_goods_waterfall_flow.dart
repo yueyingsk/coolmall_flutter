@@ -5,12 +5,12 @@ import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
 import 'package:coolmall_flutter/app/theme/color.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
-/// 商品瀑布流,普通版本
-class GoodsWaterfallFlow extends StatelessWidget {
+/// 商品瀑布流,用于Sliver列表
+class SliverGoodsWaterfallFlow extends StatelessWidget {
   final List<Goods> goodsList;
   final void Function(Goods goods)? onItemTap;
 
-  const GoodsWaterfallFlow({
+  const SliverGoodsWaterfallFlow({
     super.key,
     required this.goodsList,
     this.onItemTap,
@@ -18,16 +18,15 @@ class GoodsWaterfallFlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WaterfallFlow.builder(
+    return SliverWaterfallFlow(
       gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 6,
         crossAxisSpacing: 6,
       ),
-      itemBuilder: (context, index) {
+      delegate: SliverChildBuilderDelegate((context, index) {
         return _buildGoodsItem(context, goodsList[index]);
-      },
-      itemCount: goodsList.length,
+      }, childCount: goodsList.length),
     );
   }
 

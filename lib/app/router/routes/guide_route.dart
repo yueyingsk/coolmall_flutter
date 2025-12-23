@@ -1,5 +1,5 @@
 import 'package:coolmall_flutter/features/launch/state/guide_state.dart';
-import 'package:coolmall_flutter/features/launch/views/guide_page.dart';
+import 'package:coolmall_flutter/features/launch/view/guide_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
