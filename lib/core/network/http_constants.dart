@@ -14,4 +14,7 @@ class HttpConstans {
 
   //商品相关接口
   static const String GOODS_PAGE = "goods/info/page";
+
+  // 商品分类
+  static const String GOODS_CATEGORY = "goods/type/list";
 }

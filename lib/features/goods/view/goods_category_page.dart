@@ -9,6 +9,7 @@ import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
 import 'package:coolmall_flutter/shared/widgets/waterfall_flow/sliver_goods_waterfall_flow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class GoodsCategoryPage extends StatefulWidget {
@@ -54,6 +55,7 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
       }
     });
     context.read<GoodsCategoryState>().getGoodsListData();
+    context.read<GoodsCategoryState>().getCategoryListData();
   }
 
   @override
@@ -69,48 +71,90 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
     return Scaffold(
       body: Consumer<GoodsCategoryState>(
         builder: (context, state, child) {
-          return ScrollbarRefreshLayout(
-            onRefresh: state.refreshData,
-            onLoading: state.loadMoreData,
-            controller: state.refreshController,
-            scrollController: _scrollController,
-            sliverAppBars: [
-              _buildAppBar(context),
-              SliverPersistentHeader(
-                pinned: true,
-                floating: false,
-                delegate: _FilterBarDelegate(
-                  child: FilterBar(
-                    currentSortType: state.sortState.currentSortType,
-                    currentSortState: state.sortState.currentSortState,
-                    filtersVisible: state.sortState.isFilterVisible,
-                    onSortClick: (sortType) {
-                      state.updateSortType(sortType);
-                    },
-                    onFiltersClick: () {
-                      _showFilterDialog();
-                    },
-                    onToggleLayout: () {
-                      state.toggleViewType();
-                    },
-                    isGridLayout: !state.sortState.isListView,
-                    isAppBarVisible: state.isAppBarVisible,
-                    filterButtonKey: _filterButtonKey,
+          return Stack(
+            children: [
+              // 主要内容区域 - ScrollbarRefreshLayout
+              ScrollbarRefreshLayout(
+                onRefresh: state.refreshData,
+                onLoading: state.loadMoreData,
+                controller: state.refreshController,
+                scrollController: _scrollController,
+                sliverAppBars: [
+                  _buildAppBar(context),
+                  SliverPersistentHeader(
+                    pinned: true,
+                    floating: false,
+                    delegate: _FilterBarDelegate(
+                      child: FilterBar(
+                        currentSortType: state.sortState.currentSortType,
+                        currentSortState: state.sortState.currentSortState,
+                        filtersVisible: state.sortState.isFilterVisible,
+                        onSortClick: (sortType) {
+                          state.updateSortType(sortType);
+                        },
+                        onFiltersClick: () {
+                          state.setFilterVisible(true);
+                        },
+                        onToggleLayout: () {
+                          state.toggleViewType();
+                        },
+                        isGridLayout: !state.sortState.isListView,
+                        isAppBarVisible: state.isAppBarVisible,
+                        filterButtonKey: _filterButtonKey,
+                      ),
+                    ),
                   ),
+                ],
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(child: SizedBox(height: 10)),
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      sliver: state.sortState.isListView
+                          ? _buildListView(state.goods)
+                          : _buildWaterfallFlow(state.goods),
+                    ),
+                  ],
                 ),
               ),
-            ],
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: SizedBox(height: 10)),
-                SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  sliver: state.sortState.isListView
-                      ? _buildListView(state.goods)
-                      : _buildWaterfallFlow(state.goods),
+
+              // 筛选弹窗 - 根据isFilterVisible状态显示
+              if (state.sortState.isFilterVisible)
+                Builder(
+                  builder: (context) {
+                    RenderBox renderBox =
+                        _filterButtonKey.currentContext!.findRenderObject()
+                            as RenderBox;
+                    Offset offset = renderBox.localToGlobal(Offset.zero);
+
+                    return FilterDialog(
+                      buttonOffset: offset,
+                      categoryData: state.categoryTrees,
+                      selectedCategoryIds: state.selectedCategoryIds ?? [],
+                      minPrice: state.minPrice ?? '',
+                      maxPrice: state.maxPrice ?? '',
+                      onApplyFilters:
+                          (selectedCategoryIds, minPrice, maxPrice) {
+                            state.applyFilters(
+                              selectedCategoryIds,
+                              minPrice,
+                              maxPrice,
+                            );
+                          },
+                      onResetFilters: () {
+                        state.resetFilters();
+                      },
+                      onClose: () {
+                        state.setFilterVisible(false);
+                      },
+                      onAnimationEnd: () {
+                        // 动画结束后更新可见性状态
+                        state.setFilterVisible(false);
+                      },
+                    );
+                  },
                 ),
-              ],
-            ),
+            ],
           );
         },
       ),
@@ -126,7 +170,7 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
       leading: Padding(
         padding: const EdgeInsets.all(6),
         child: GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () => context.pop(),
           child: SvgPicture.asset(
             'assets/drawable/ic_left.svg',
             width: 24,
@@ -325,50 +369,6 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
         );
       },
     );
-  }
-
-  /// 显示筛选弹窗
-  void _showFilterDialog() {
-    RenderBox renderBox =
-        _filterButtonKey.currentContext!.findRenderObject() as RenderBox;
-    Offset offset = renderBox.localToGlobal(Offset.zero);
-
-    // 更新筛选器可见性状态
-    context.read<GoodsCategoryState>().setFilterVisible(true);
-
-    // 创建覆盖层状态
-    OverlayState overlayState = Overlay.of(context);
-
-    // 初始化覆盖层条目引用
-    OverlayEntry? filterEntry;
-
-    // 定义动画结束回调
-    void onAnimationEnd() {
-      if (filterEntry != null) {
-        filterEntry.remove();
-        context.read<GoodsCategoryState>().setFilterVisible(false);
-      }
-    }
-
-    // 创建筛选弹窗覆盖层
-    filterEntry = OverlayEntry(
-      builder: (context) {
-        // 创建FilterDialog的GlobalKey
-
-        return FilterDialog(
-          buttonOffset: offset,
-          onConfirm: () {}, // 确认操作在FilterDialog内部处理
-          onReset: () {
-            // 重置筛选
-          },
-          onClose: () {}, // 关闭操作在FilterDialog内部处理
-          onAnimationEnd: onAnimationEnd, // 动画结束回调
-        );
-      },
-    );
-
-    // 插入覆盖层
-    overlayState.insert(filterEntry);
   }
 
   void updateScrollInfo(bool isUpdateAppbar) {

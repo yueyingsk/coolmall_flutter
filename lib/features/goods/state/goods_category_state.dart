@@ -1,3 +1,4 @@
+import 'package:coolmall_flutter/features/goods/model/category_tree.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_category_page_args.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_search_request.dart';
 import 'package:coolmall_flutter/features/goods/repository/goods_repository.dart';
@@ -74,6 +75,9 @@ class GoodsCategoryState extends ChangeNotifier {
   /// 排序状态
   SortManagementState get sortState => _sortState;
 
+  /// 分类是否加载完成
+  bool categoryLoaded = false;
+
   /// 商品列表
   final List<Goods> _goods = [];
   List<Goods> get goods => _goods;
@@ -115,12 +119,14 @@ class GoodsCategoryState extends ChangeNotifier {
         )
         .then((value) {
           _goods.addAll(value.list);
-          if (goodsSearchRequest.page * goodsSearchRequest.size >=
-              value.pagination.total) {
-            _refreshController.loadNoData();
-          } else {
-            goodsSearchRequest.page++;
-            _refreshController.loadComplete();
+          if (_goods.isNotEmpty) {
+            if (goodsSearchRequest.page * goodsSearchRequest.size >=
+                value.pagination.total) {
+              _refreshController.loadNoData();
+            } else {
+              goodsSearchRequest.page++;
+              _refreshController.loadComplete();
+            }
           }
         });
     _refreshController.refreshCompleted();
@@ -180,19 +186,38 @@ class GoodsCategoryState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 切换筛选弹窗显示状态
-  void toggleFilterVisible() {
-    _sortState = _sortState.copyWith(
-      isFilterVisible: !_sortState.isFilterVisible,
-    );
-    notifyListeners();
-  }
+  // /// 切换筛选弹窗显示状态
+  // void toggleFilterVisible() {
+  //   _sortState = _sortState.copyWith(
+  //     isFilterVisible: !_sortState.isFilterVisible,
+  //   );
+  //   if (_sortState.isFilterVisible) {
+  //     if (!categoryLoaded) {
+  //       getCategoryListData();
+  //     }
+  //   }
+  //   notifyListeners();
+  // }
 
   /// 设置筛选弹窗显示状态
   void setFilterVisible(bool visible) {
     _sortState = _sortState.copyWith(isFilterVisible: visible);
+    if (visible) {
+      if (!categoryLoaded) {
+        Future.delayed(const Duration(milliseconds: 340), () {
+          getCategoryListData();
+        });
+      }
+    }
     notifyListeners();
   }
+
+  // /// 显示分类内容
+  // void showCategoryContent() {
+  //   if (!categoryLoaded) {
+  //     getCategoryListData();
+  //   }
+  // }
 
   /// 更新搜索文本
   void updateSearchText(String text) {
@@ -203,6 +228,103 @@ class GoodsCategoryState extends ChangeNotifier {
   /// 执行搜索
   Future<void> performSearch() async {
     if (_searchText?.isEmpty ?? true) return;
+    refreshData();
+  }
+
+  /// 分类树数据
+  List<CategoryTree> _categoryTrees = [];
+  List<CategoryTree> get categoryTrees => _categoryTrees;
+
+  /// 加载分类列表数据
+  Future<void> getCategoryListData() async {
+    await goodsRepository.getCategoryList().then((value) {
+      _categoryTrees = convertToTree(value);
+      categoryLoaded = true;
+      notifyListeners();
+    });
+  }
+
+  /// 将Category列表转换为CategoryTree树形结构
+  ///
+  /// @param categories 原始分类列表
+  /// @return 树形结构的分类列表
+  List<CategoryTree> convertToTree(List<Category> categories) {
+    // 按sortNum排序的列表
+    final sortedList = categories
+      ..sort((a, b) => a.sortNum.compareTo(b.sortNum));
+
+    // 将Category转换为CategoryTree
+    final categoryTrees = sortedList
+        .map((category) => CategoryTree.fromCategory(category))
+        .toList();
+
+    // 找出顶级分类
+    final rootCategories = <CategoryTree>[];
+
+    // 子分类映射，key是父ID，value是子分类列表
+    final childrenMap = <int, List<CategoryTree>>{};
+
+    // 将分类按父ID分组
+    for (var categoryTree in categoryTrees) {
+      final parentId = categoryTree.parentId;
+      if (parentId == null) {
+        // 顶级分类
+        rootCategories.add(categoryTree);
+      } else {
+        // 添加到子分类映射
+        final children = childrenMap.putIfAbsent(parentId, () => []);
+        children.add(categoryTree);
+      }
+    }
+
+    // 递归构建树
+    return rootCategories.map((rootCategory) {
+      return buildCategoryTree(rootCategory, childrenMap);
+    }).toList();
+  }
+
+  /// 递归构建分类树
+  ///
+  /// @param categoryTree 当前分类树节点
+  /// @param childrenMap 子分类映射
+  /// @return 构建好的分类树
+  CategoryTree buildCategoryTree(
+    CategoryTree categoryTree,
+    Map<int, List<CategoryTree>> childrenMap,
+  ) {
+    final children = childrenMap[categoryTree.id] ?? [];
+
+    // 如果没有子分类，直接返回
+    if (children.isEmpty) {
+      return categoryTree;
+    }
+
+    // 递归构建每个子分类的树
+    final childrenTree = children.map((child) {
+      return buildCategoryTree(child, childrenMap);
+    }).toList();
+
+    // 创建一个新的CategoryTree对象，包含子分类列表
+    return categoryTree.copyWith(children: childrenTree);
+  }
+
+  /// 应用筛选
+  void applyFilters(
+    List<int> selectedCategoryIds,
+    String minPrice,
+    String maxPrice,
+  ) {
+    _selectedCategoryIds = selectedCategoryIds;
+    _minPrice = minPrice;
+    _maxPrice = maxPrice;
+    refreshData();
+  }
+
+  /// 重置筛选
+  void resetFilters() {
+    _selectedCategoryIds = null;
+    _minPrice = null;
+    _maxPrice = null;
     refreshData();
   }
 }
