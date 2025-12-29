@@ -1,5 +1,6 @@
 import 'package:coolmall_flutter/core/network/http_constants.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 /// 网络服务类
 class NetworkService {
@@ -60,7 +61,7 @@ class NetworkService {
         data: data,
       );
       final responseData = response.data as Map<String, dynamic>;
-      // print(responseData);
+      debugPrint(responseData.toString());
       if (responseData["code"] == GlobalConstans.SUCCESS_CODE) {
         return responseData["data"];
       }

@@ -1,5 +1,5 @@
+import 'package:coolmall_flutter/features/goods/model/goods.dart';
 import 'package:flutter/material.dart';
-import 'package:coolmall_flutter/features/main/model/home_data.dart';
 import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
 import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
 import 'package:coolmall_flutter/app/theme/color.dart';

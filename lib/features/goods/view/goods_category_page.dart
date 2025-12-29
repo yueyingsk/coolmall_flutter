@@ -2,7 +2,6 @@ import 'package:coolmall_flutter/app/theme/color.dart';
 import 'package:coolmall_flutter/features/goods/state/goods_category_state.dart';
 import 'package:coolmall_flutter/features/goods/widget/filter_bar.dart';
 import 'package:coolmall_flutter/features/goods/widget/filter_dialog.dart';
-import 'package:coolmall_flutter/features/main/model/home_data.dart';
 import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
 import 'package:coolmall_flutter/shared/widgets/refresh/scrollbar_refresh_layout.dart';
 import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
@@ -111,8 +110,8 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
                     SliverPadding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       sliver: state.sortState.isListView
-                          ? _buildListView(state.goods)
-                          : _buildWaterfallFlow(state.goods),
+                          ? _buildListView(state)
+                          : _buildWaterfallFlow(state),
                     ),
                   ],
                 ),
@@ -286,24 +285,26 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
   }
 
   /// 构建瀑布流视图
-  Widget _buildWaterfallFlow(List<Goods> goods) {
+  Widget _buildWaterfallFlow(GoodsCategoryState state) {
     return SliverGoodsWaterfallFlow(
-      goodsList: goods,
+      goodsList: state.goods,
       onItemTap: (goods) {
         // 跳转到商品详情页
+        state.toGoodsDetailPage(context, goods.id);
       },
     );
   }
 
   /// 构建列表视图
-  Widget _buildListView(List<Goods> goods) {
+  Widget _buildListView(GoodsCategoryState state) {
     return SliverList.builder(
-      itemCount: goods.length,
+      itemCount: state.goods.length,
       itemBuilder: (context, index) {
-        final goodsItem = goods[index];
+        final goodsItem = state.goods[index];
         return GestureDetector(
           onTap: () {
             // 跳转到商品详情页
+            state.toGoodsDetailPage(context, goodsItem.id);
           },
           child: Card(
             elevation: 0,

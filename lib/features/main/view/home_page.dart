@@ -1,8 +1,12 @@
 import 'package:coolmall_flutter/app/router/app_routes.dart';
 import 'package:coolmall_flutter/app/theme/color.dart';
+import 'package:coolmall_flutter/features/goods/model/coupon.dart';
+import 'package:coolmall_flutter/features/goods/model/goods.dart';
+import 'package:coolmall_flutter/features/goods/model/goods_category.dart';
 import 'package:coolmall_flutter/features/main/state/home_state.dart';
 import 'package:coolmall_flutter/shared/widgets/refresh/scrollbar_refresh_layout.dart';
 import 'package:coolmall_flutter/shared/widgets/text/price_text.dart';
+import 'package:coolmall_flutter/shared/widgets/title/title_with_line.dart';
 import 'package:coolmall_flutter/shared/widgets/waterfall_flow/sliver_goods_waterfall_flow.dart';
 import 'package:flutter/material.dart' hide Banner;
 import 'package:flutter_svg/svg.dart';
@@ -10,7 +14,6 @@ import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
 import 'package:coolmall_flutter/shared/widgets/swiper/swiper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:coolmall_flutter/features/main/model/home_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,26 +75,31 @@ class _HomePageState extends State<HomePage> {
                     child: _buildFlashSale(
                       context,
                       state.homeData?.flashSale ?? [],
+                      (goods) {
+                        // 跳转到商品详情页
+                        state.toGoodsDetailPage(context, goods.id);
+                      },
                     ),
                   ),
-                  SliverToBoxAdapter(
-                    child: _buildAllGoodsTitle(context, "推荐商品"),
-                  ),
+                  SliverToBoxAdapter(child: _buildAllGoodsTitle("推荐商品")),
                   SliverToBoxAdapter(
                     child: _buildRecommendGoods(
                       context,
                       state.homeData?.recommend ?? [],
+                      (goods) {
+                        // 跳转到商品详情页
+                        state.toGoodsDetailPage(context, goods.id);
+                      },
                     ),
                   ),
                   // 全部商品标题
-                  SliverToBoxAdapter(
-                    child: _buildAllGoodsTitle(context, '全部商品'),
-                  ),
+                  SliverToBoxAdapter(child: _buildAllGoodsTitle('全部商品')),
                   // 全部商品列表（瀑布流）
                   SliverGoodsWaterfallFlow(
                     goodsList: state.goods,
                     onItemTap: (goods) {
                       // 跳转到商品详情页
+                      state.toGoodsDetailPage(context, goods.id);
                     },
                   ),
                 ],
@@ -356,7 +364,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建限时精选区域
-  Widget _buildFlashSale(BuildContext context, List<Goods> goods) {
+  Widget _buildFlashSale(
+    BuildContext context,
+    List<Goods> goods,
+    ValueChanged<Goods> onItemTap,
+  ) {
     return Card(
       elevation: 0,
       color: Colors.white,
@@ -399,7 +411,7 @@ class _HomePageState extends State<HomePage> {
               scrollDirection: Axis.horizontal,
               itemCount: goods.length,
               itemBuilder: (context, index) {
-                return _buildFlashSaleItem(context, index, goods);
+                return _buildFlashSaleItem(context, index, goods, onItemTap);
               },
             ),
           ),
@@ -412,10 +424,12 @@ class _HomePageState extends State<HomePage> {
     BuildContext context,
     int index,
     List<Goods> goods,
+    ValueChanged<Goods> onItemTap,
   ) {
     return GestureDetector(
       onTap: () {
         // 跳转到商品详情页
+        onItemTap(goods[index]);
       },
       child: Container(
         margin: EdgeInsetsGeometry.only(
@@ -449,13 +463,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 构建推荐商品区域
-  Widget _buildRecommendGoods(BuildContext context, List<Goods> goods) {
+  Widget _buildRecommendGoods(
+    BuildContext context,
+    List<Goods> goods,
+    ValueChanged<Goods> onItemTap,
+  ) {
     return Column(
       children: [
         for (var goodsItem in goods)
           GestureDetector(
             onTap: () {
               // 跳转到商品详情页
+              onItemTap(goodsItem);
             },
             child: Card(
               elevation: 0,
@@ -522,33 +541,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget? _buildAllGoodsTitle(BuildContext context, String title) {
+  Widget? _buildAllGoodsTitle(String title) {
     return Column(
       children: [
         SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(width: 4),
-            Container(
-              width: 4,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
+        TitleWithLine(title: title),
         SizedBox(height: 10),
       ],
     );

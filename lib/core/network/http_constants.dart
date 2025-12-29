@@ -17,4 +17,8 @@ class HttpConstans {
 
   // 商品分类
   static const String GOODS_CATEGORY = "goods/type/list";
+  // 商品详情
+  static const String GOODS_DETAIL = "page/goodsDetail";
+  // 商品规格
+  static const String GOODS_SPEC = "goods/spec/list";
 }

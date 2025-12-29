@@ -1,4 +1,5 @@
 import 'package:coolmall_flutter/app/router/app_routes.dart';
+import 'package:coolmall_flutter/features/goods/model/goods.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_category_page_args.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_search_request.dart';
 import 'package:coolmall_flutter/features/goods/repository/goods_repository.dart';
@@ -69,5 +70,9 @@ class HomeState extends ChangeNotifier {
       AppRoutes.goodsCategory,
       extra: GoodsCategoryPageArgs(selectedCategoryIds: categoryIds),
     );
+  }
+
+  void toGoodsDetailPage(BuildContext context, int id) {
+    context.push(AppRoutes.goodsDetail, extra: id);
   }
 }

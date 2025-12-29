@@ -7,4 +7,5 @@ class AppRoutes {
   static const String cart = '/cart';
   static const String mine = '/mine';
   static const String goodsCategory = '/goods_category';
+  static const String goodsDetail = '/goods_detail';
 }

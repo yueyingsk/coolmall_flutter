@@ -118,7 +118,7 @@ class FilterBar extends StatelessWidget {
             ),
 
             // 占位符，将布局切换按钮推到最右侧
-            Expanded(child: const Spacer()),
+            const Spacer(),
 
             // 布局切换按钮
             AnimatedScale(

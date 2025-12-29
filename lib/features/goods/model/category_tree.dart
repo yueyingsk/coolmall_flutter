@@ -1,4 +1,4 @@
-import 'package:coolmall_flutter/features/main/model/home_data.dart';
+import 'package:coolmall_flutter/features/goods/model/goods_category.dart';
 
 /// 分类树结构
 class CategoryTree {

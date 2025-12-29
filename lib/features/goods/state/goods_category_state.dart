@@ -1,9 +1,13 @@
+import 'package:coolmall_flutter/app/router/app_routes.dart';
 import 'package:coolmall_flutter/features/goods/model/category_tree.dart';
+import 'package:coolmall_flutter/features/goods/model/goods.dart';
+import 'package:coolmall_flutter/features/goods/model/goods_category.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_category_page_args.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_search_request.dart';
 import 'package:coolmall_flutter/features/goods/repository/goods_repository.dart';
 import 'package:coolmall_flutter/features/main/model/home_data.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../model/sort_state.dart';
 import '../model/sort_type.dart';
@@ -326,5 +330,10 @@ class GoodsCategoryState extends ChangeNotifier {
     _minPrice = null;
     _maxPrice = null;
     refreshData();
+  }
+
+  /// 跳转到商品详情页面
+  void toGoodsDetailPage(BuildContext context, int goodsId) {
+    context.push(AppRoutes.goodsDetail, extra: goodsId);
   }
 }

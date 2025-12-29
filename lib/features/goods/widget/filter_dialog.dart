@@ -1,4 +1,3 @@
-import 'package:coolmall_flutter/features/goods/state/goods_category_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:coolmall_flutter/shared/widgets/image/network_image.dart';
