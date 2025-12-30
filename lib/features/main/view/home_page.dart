@@ -38,82 +38,87 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<HomeState>(
-        builder: (context, state, child) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: ScrollbarRefreshLayout(
-              onRefresh: state.refreshData,
-              onLoading: state.loadMoreData,
-              controller: state.refreshController,
-              sliverAppBars: [_buildAppBar(context)],
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: _buildBanner(context, state.homeData?.banner ?? []),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 5)),
-                  SliverToBoxAdapter(
-                    child: _buildCouponSection(
-                      context,
-                      state.homeData?.coupon ?? [],
+      body: SafeArea(
+        child: Consumer<HomeState>(
+          builder: (context, state, child) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: ScrollbarRefreshLayout(
+                onRefresh: state.refreshData,
+                onLoading: state.loadMoreData,
+                controller: state.refreshController,
+                sliverAppBars: [_buildAppBar(context, state)],
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: _buildBanner(
+                        context,
+                        state.homeData?.banner ?? [],
+                      ),
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 5)),
-                  SliverToBoxAdapter(
-                    child: _buildCategory(
-                      context,
-                      state.homeData?.category ?? [],
-                      (category) {
-                        // 处理分类项点击事件
-                        state.toGoodsCategoryPage(context, category.id);
-                      },
+                    SliverToBoxAdapter(child: SizedBox(height: 5)),
+                    SliverToBoxAdapter(
+                      child: _buildCouponSection(
+                        context,
+                        state.homeData?.coupon ?? [],
+                      ),
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 5)),
-                  SliverToBoxAdapter(
-                    child: _buildFlashSale(
-                      context,
-                      state.homeData?.flashSale ?? [],
-                      (goods) {
+                    SliverToBoxAdapter(child: SizedBox(height: 5)),
+                    SliverToBoxAdapter(
+                      child: _buildCategory(
+                        context,
+                        state.homeData?.category ?? [],
+                        (category) {
+                          // 处理分类项点击事件
+                          state.toGoodsCategoryPage(context, category.id);
+                        },
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: SizedBox(height: 5)),
+                    SliverToBoxAdapter(
+                      child: _buildFlashSale(
+                        context,
+                        state.homeData?.flashSale ?? [],
+                        (goods) {
+                          // 跳转到商品详情页
+                          state.toGoodsDetailPage(context, goods.id);
+                        },
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: _buildAllGoodsTitle("推荐商品")),
+                    SliverToBoxAdapter(
+                      child: _buildRecommendGoods(
+                        context,
+                        state.homeData?.recommend ?? [],
+                        (goods) {
+                          // 跳转到商品详情页
+                          state.toGoodsDetailPage(context, goods.id);
+                        },
+                      ),
+                    ),
+                    // 全部商品标题
+                    SliverToBoxAdapter(child: _buildAllGoodsTitle('全部商品')),
+                    // 全部商品列表（瀑布流）
+                    SliverGoodsWaterfallFlow(
+                      goodsList: state.goods,
+                      onItemTap: (goods) {
                         // 跳转到商品详情页
                         state.toGoodsDetailPage(context, goods.id);
                       },
                     ),
-                  ),
-                  SliverToBoxAdapter(child: _buildAllGoodsTitle("推荐商品")),
-                  SliverToBoxAdapter(
-                    child: _buildRecommendGoods(
-                      context,
-                      state.homeData?.recommend ?? [],
-                      (goods) {
-                        // 跳转到商品详情页
-                        state.toGoodsDetailPage(context, goods.id);
-                      },
-                    ),
-                  ),
-                  // 全部商品标题
-                  SliverToBoxAdapter(child: _buildAllGoodsTitle('全部商品')),
-                  // 全部商品列表（瀑布流）
-                  SliverGoodsWaterfallFlow(
-                    goodsList: state.goods,
-                    onItemTap: (goods) {
-                      // 跳转到商品详情页
-                      state.toGoodsDetailPage(context, goods.id);
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 
   /// 构建AppBar
   /// 构建AppBar
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, HomeState state) {
     return SliverAppBar(
       leadingWidth: 50,
       leading: Padding(
@@ -167,12 +172,18 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       actions: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: SvgPicture.asset(
-            width: 27,
-            height: 27,
-            'assets/drawable/ic_github.svg',
+        GestureDetector(
+          onTap: () {
+            // 跳转Github页
+            state.toGithubPage(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: SvgPicture.asset(
+              width: 27,
+              height: 27,
+              'assets/drawable/ic_github.svg',
+            ),
           ),
         ),
       ],

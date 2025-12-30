@@ -8,4 +8,5 @@ class AppRoutes {
   static const String mine = '/mine';
   static const String goodsCategory = '/goods_category';
   static const String goodsDetail = '/goods_detail';
+  static const String web = '/web';
 }

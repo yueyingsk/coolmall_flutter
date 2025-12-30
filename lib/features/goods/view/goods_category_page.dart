@@ -68,94 +68,96 @@ class _GoodsCategoryPageState extends State<GoodsCategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<GoodsCategoryState>(
-        builder: (context, state, child) {
-          return Stack(
-            children: [
-              // 主要内容区域 - ScrollbarRefreshLayout
-              ScrollbarRefreshLayout(
-                onRefresh: state.refreshData,
-                onLoading: state.loadMoreData,
-                controller: state.refreshController,
-                scrollController: _scrollController,
-                sliverAppBars: [
-                  _buildAppBar(context),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    floating: false,
-                    delegate: _FilterBarDelegate(
-                      child: FilterBar(
-                        currentSortType: state.sortState.currentSortType,
-                        currentSortState: state.sortState.currentSortState,
-                        filtersVisible: state.sortState.isFilterVisible,
-                        onSortClick: (sortType) {
-                          state.updateSortType(sortType);
-                        },
-                        onFiltersClick: () {
-                          state.setFilterVisible(true);
-                        },
-                        onToggleLayout: () {
-                          state.toggleViewType();
-                        },
-                        isGridLayout: !state.sortState.isListView,
-                        isAppBarVisible: state.isAppBarVisible,
-                        filterButtonKey: _filterButtonKey,
+      body: SafeArea(
+        child: Consumer<GoodsCategoryState>(
+          builder: (context, state, child) {
+            return Stack(
+              children: [
+                // 主要内容区域 - ScrollbarRefreshLayout
+                ScrollbarRefreshLayout(
+                  onRefresh: state.refreshData,
+                  onLoading: state.loadMoreData,
+                  controller: state.refreshController,
+                  scrollController: _scrollController,
+                  sliverAppBars: [
+                    _buildAppBar(context),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      floating: false,
+                      delegate: _FilterBarDelegate(
+                        child: FilterBar(
+                          currentSortType: state.sortState.currentSortType,
+                          currentSortState: state.sortState.currentSortState,
+                          filtersVisible: state.sortState.isFilterVisible,
+                          onSortClick: (sortType) {
+                            state.updateSortType(sortType);
+                          },
+                          onFiltersClick: () {
+                            state.setFilterVisible(true);
+                          },
+                          onToggleLayout: () {
+                            state.toggleViewType();
+                          },
+                          isGridLayout: !state.sortState.isListView,
+                          isAppBarVisible: state.isAppBarVisible,
+                          filterButtonKey: _filterButtonKey,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-                child: CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(child: SizedBox(height: 10)),
-                    SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      sliver: state.sortState.isListView
-                          ? _buildListView(state)
-                          : _buildWaterfallFlow(state),
-                    ),
                   ],
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(child: SizedBox(height: 10)),
+                      SliverPadding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        sliver: state.sortState.isListView
+                            ? _buildListView(state)
+                            : _buildWaterfallFlow(state),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              // 筛选弹窗 - 根据isFilterVisible状态显示
-              if (state.sortState.isFilterVisible)
-                Builder(
-                  builder: (context) {
-                    RenderBox renderBox =
-                        _filterButtonKey.currentContext!.findRenderObject()
-                            as RenderBox;
-                    Offset offset = renderBox.localToGlobal(Offset.zero);
+                // 筛选弹窗 - 根据isFilterVisible状态显示
+                if (state.sortState.isFilterVisible)
+                  Builder(
+                    builder: (context) {
+                      RenderBox renderBox =
+                          _filterButtonKey.currentContext!.findRenderObject()
+                              as RenderBox;
+                      Offset offset = renderBox.localToGlobal(Offset.zero);
 
-                    return FilterDialog(
-                      buttonOffset: offset,
-                      categoryData: state.categoryTrees,
-                      selectedCategoryIds: state.selectedCategoryIds ?? [],
-                      minPrice: state.minPrice ?? '',
-                      maxPrice: state.maxPrice ?? '',
-                      onApplyFilters:
-                          (selectedCategoryIds, minPrice, maxPrice) {
-                            state.applyFilters(
-                              selectedCategoryIds,
-                              minPrice,
-                              maxPrice,
-                            );
-                          },
-                      onResetFilters: () {
-                        state.resetFilters();
-                      },
-                      onClose: () {
-                        state.setFilterVisible(false);
-                      },
-                      onAnimationEnd: () {
-                        // 动画结束后更新可见性状态
-                        state.setFilterVisible(false);
-                      },
-                    );
-                  },
-                ),
-            ],
-          );
-        },
+                      return FilterDialog(
+                        buttonOffset: offset,
+                        categoryData: state.categoryTrees,
+                        selectedCategoryIds: state.selectedCategoryIds ?? [],
+                        minPrice: state.minPrice ?? '',
+                        maxPrice: state.maxPrice ?? '',
+                        onApplyFilters:
+                            (selectedCategoryIds, minPrice, maxPrice) {
+                              state.applyFilters(
+                                selectedCategoryIds,
+                                minPrice,
+                                maxPrice,
+                              );
+                            },
+                        onResetFilters: () {
+                          state.resetFilters();
+                        },
+                        onClose: () {
+                          state.setFilterVisible(false);
+                        },
+                        onAnimationEnd: () {
+                          // 动画结束后更新可见性状态
+                          state.setFilterVisible(false);
+                        },
+                      );
+                    },
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

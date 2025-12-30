@@ -54,6 +54,10 @@ dependencies:
   dio: ^5.9.0
   # 瀑布流布局库
   waterfall_flow: ^3.1.1
+  # WebView库
+  webview_flutter: ^4.13.0
+  # 打开URL库（用浏览器打开链接）
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

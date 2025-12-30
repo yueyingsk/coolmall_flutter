@@ -12,7 +12,7 @@ class GoodsInfoCard extends StatelessWidget {
   final GoodsSpec? selectedSpec;
   final VoidCallback onShowCoupon;
   final VoidCallback onShowSpecModal;
-  final String? specSelectionText;
+  final String specSelectionText;
 
   const GoodsInfoCard({
     super.key,
@@ -20,7 +20,7 @@ class GoodsInfoCard extends StatelessWidget {
     this.selectedSpec,
     required this.onShowCoupon,
     required this.onShowSpecModal,
-    this.specSelectionText,
+    required this.specSelectionText,
   });
 
   /// 优惠券项
@@ -148,9 +148,7 @@ class GoodsInfoCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      specSelectionText == null
-                          ? '请选择规格'
-                          : "已选: $specSelectionText",
+                      specSelectionText,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(
                           alpha: 0.8,

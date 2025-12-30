@@ -56,9 +56,9 @@ class _GoodsDetailPageState extends State<GoodsDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Consumer<GoodsDetailState>(
+    return Scaffold(
+      body: SafeArea(
+        child: Consumer<GoodsDetailState>(
           builder: (context, state, child) {
             return _buildContent(state);
           },

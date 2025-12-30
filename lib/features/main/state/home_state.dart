@@ -1,4 +1,5 @@
 import 'package:coolmall_flutter/app/router/app_routes.dart';
+import 'package:coolmall_flutter/features/common/model/web_view_data.dart';
 import 'package:coolmall_flutter/features/goods/model/goods.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_category_page_args.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_search_request.dart';
@@ -72,7 +73,19 @@ class HomeState extends ChangeNotifier {
     );
   }
 
+  /// 跳转商品详情页
   void toGoodsDetailPage(BuildContext context, int id) {
     context.push(AppRoutes.goodsDetail, extra: id);
+  }
+
+  /// 跳转Github页
+  void toGithubPage(BuildContext context) {
+    context.push(
+      AppRoutes.web,
+      extra: WebViewData(
+        url: 'https://github.com/yueyingsk/coolmall_flutter',
+        title: 'GitHub',
+      ),
+    );
   }
 }

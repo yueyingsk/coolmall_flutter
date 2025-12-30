@@ -14,7 +14,6 @@ class GoodsDetailState extends ChangeNotifier {
   bool _isSpecModalVisible = false;
   List<GoodsSpec> _specs = [];
   GoodsSpec? _selectedSpec;
-  NetworkState _specsNetworkState = NetworkState.loading;
 
   // 优惠券弹窗状态
   bool _isCouponModalVisible = false;
@@ -31,7 +30,6 @@ class GoodsDetailState extends ChangeNotifier {
   bool get isSpecModalVisible => _isSpecModalVisible;
   List<GoodsSpec> get specs => _specs;
   GoodsSpec? get selectedSpec => _selectedSpec;
-  NetworkState get specsNetworkState => _specsNetworkState;
   bool get isCouponModalVisible => _isCouponModalVisible;
   bool get hasAnimated => _hasAnimated;
   int get cartCount => _cartCount;
@@ -55,7 +53,7 @@ class GoodsDetailState extends ChangeNotifier {
     return '请选择规格';
   }
 
-  // 初始化数据（模拟网络请求）
+  // 初始化数据
   Future<void> loadGoodsDetail(int goodsId) async {
     _networkState = NetworkState.loading;
     notifyListeners();
@@ -64,7 +62,7 @@ class GoodsDetailState extends ChangeNotifier {
       _goodsDetail = await goodsRepository.getGoodsDetail(goodsId);
 
       _networkState = NetworkState.success;
-
+      loadGoodsSpecs();
       // 添加到足迹记录
       await _addToFootprint();
     } catch (e) {
@@ -87,16 +85,9 @@ class GoodsDetailState extends ChangeNotifier {
     if (_goodsDetail?.goodsInfo.specs.isNotEmpty == true) return;
     if (_goodsDetail == null) return;
 
-    _specsNetworkState = NetworkState.loading;
     notifyListeners();
 
-    try {
-      _specs = await goodsRepository.getGoodsSpec(_goodsDetail!.goodsInfo.id);
-
-      _specsNetworkState = NetworkState.success;
-    } catch (e) {
-      _specsNetworkState = NetworkState.error;
-    }
+    _specs = await goodsRepository.getGoodsSpec(_goodsDetail!.goodsInfo.id);
 
     notifyListeners();
   }
@@ -117,9 +108,7 @@ class GoodsDetailState extends ChangeNotifier {
   void showSpecModal() {
     _isSpecModalVisible = true;
     // 弹窗展开时加载规格数据
-    if (_goodsDetail != null && _specsNetworkState == NetworkState.loading) {
-      loadGoodsSpecs();
-    }
+    loadGoodsSpecs();
     notifyListeners();
   }
 
@@ -131,9 +120,7 @@ class GoodsDetailState extends ChangeNotifier {
 
   // 规格弹窗展开完成回调
   void onSpecModalExpanded() {
-    if (_goodsDetail != null && _specsNetworkState == NetworkState.loading) {
-      loadGoodsSpecs();
-    }
+    loadGoodsSpecs();
   }
 
   // 显示优惠券弹窗
