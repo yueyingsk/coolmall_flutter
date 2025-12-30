@@ -28,7 +28,7 @@ _🛍️ 基于 Flutter 的现代化电商应用_
 
 > 如果项目对您有帮助，请给个 Star 支持 ⭐ 这对Flutter版本的移植工作非常重要！
 
-## 📱 项目预览
+<!-- ## 📱 项目预览
 
 > 💡 **说明**：Flutter版本复刻了原项目的所有界面效果和动画
 
@@ -52,7 +52,7 @@ _🛍️ 基于 Flutter 的现代化电商应用_
 
 <img src="docs/images/flutter/dark/1.png" alt="青商城Flutter深色模式1"/>
 <img src="docs/images/flutter/dark/2.png" alt="青商城Flutter深色模式2"/>
-<img src="docs/images/flutter/dark/3.png" alt="青商城Flutter深色模式3"/>
+<img src="docs/images/flutter/dark/3.png" alt="青商城Flutter深色模式3"/> -->
 
 ## 🛠️ 技术栈
 

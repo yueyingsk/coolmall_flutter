@@ -26,7 +26,7 @@ class GoodsSpec {
       id: json['id'],
       goodsId: json['goodsId'],
       name: json['name'],
-      price: json['price'].toDouble(),
+      price: json['price'],
       stock: json['stock'],
       sortNum: json['sortNum'],
       images: json['images'] != null ? List<String>.from(json['images']) : null,

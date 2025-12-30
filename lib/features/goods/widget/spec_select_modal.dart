@@ -388,9 +388,10 @@ class _SpecSelectModalState extends State<SpecSelectModal>
   }
 
   Widget _buildSpecItem(GoodsSpec spec, ColorScheme colorScheme) {
+    final double itemWidth = (MediaQuery.of(context).size.width - 40) / 3;
     return Container(
-      width: 120,
-      height: 165,
+      width: itemWidth,
+      height: itemWidth + 45,
       decoration: BoxDecoration(
         border: Border.all(
           width: 1,
@@ -405,8 +406,8 @@ class _SpecSelectModalState extends State<SpecSelectModal>
         children: [
           NetworkImageWidget(
             showBackground: true,
-            width: 120,
-            height: 120,
+            width: itemWidth,
+            height: itemWidth,
             imageUrl: (spec.images?.isNotEmpty == true)
                 ? spec.images!.first
                 : widget.goods.mainPic,
