@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:coolmall_flutter/app/state/states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:coolmall_flutter/app/bootstrap.dart';
 import 'package:coolmall_flutter/app/router/router.dart';
@@ -12,6 +15,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Bootstrap.initialize();
   runApp(const MyApp());
+  if (Platform.isAndroid) {
+    SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    );
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
 }
 
 class MyApp extends StatelessWidget {

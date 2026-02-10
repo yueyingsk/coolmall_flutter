@@ -186,7 +186,6 @@ class _SpecSelectModalState extends State<SpecSelectModal>
               spacing: 8,
               runSpacing: 8,
               children: widget.specs.map((spec) {
-                final isSelected = widget.selectedSpec?.id == spec.id;
                 return GestureDetector(
                   onTap: () => widget.onSpecSelected(spec),
                   child: _buildSpecItem(spec, colorScheme),

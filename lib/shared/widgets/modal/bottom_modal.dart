@@ -70,9 +70,6 @@ class _BottomModalState extends State<BottomModal> {
           snap: true,
           snapSizes: const [0.6, 0.8],
           builder: (context, scrollController) {
-            // 如果我们有自己的滚动控制器，使用它；否则使用传入的
-            final controller = _scrollController;
-
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(

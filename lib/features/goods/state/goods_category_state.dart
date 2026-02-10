@@ -5,7 +5,6 @@ import 'package:coolmall_flutter/features/goods/model/goods_category.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_category_page_args.dart';
 import 'package:coolmall_flutter/features/goods/model/goods_search_request.dart';
 import 'package:coolmall_flutter/features/goods/repository/goods_repository.dart';
-import 'package:coolmall_flutter/features/main/model/home_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
